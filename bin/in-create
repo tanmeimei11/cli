@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+'use strict'
+
+const shelljs = require('shelljs')
+const program = require('commander').parse(process.argv)
+const logger = require('../lib/logger')
+const exec = require('../lib/exec')
+
+const projectName = program.args[0]
+const template = program.args[1] || 'vue-multipage'
+
+if (!projectName) {
+  logger.fatal('project-name is required.')
+}
+
+shelljs.mkdir(projectName)
+shelljs.cd(projectName)
+exec('in', ['init', template], {
+  stdio: 'inherit',
+})

@@ -1,8 +1,10 @@
 #!/usr/bin/env node
+'use strict'
 
-var logger = require('../lib/logger')
-var request = require('request')
-var chalk = require('chalk')
+const logger = require('../lib/logger')
+const request = require('request')
+const chalk = require('chalk')
+const ora = require('ora')
 
 /**
  * Padding.
@@ -13,28 +15,38 @@ process.on('exit', function () {
   console.log()
 })
 
+let spinner = ora('reading')
+spinner.start()
+
 /**
  * List repos.
  */
 
 request({
-  url: 'https://api.github.com/users/vuejs-templates/repos',
+  url: 'http://githost.in66.cc/api/v3/groups/303',
   headers: {
-    'User-Agent': 'vue-cli'
+    'User-Agent': 'in-cli',
+    'PRIVATE-TOKEN': 'zEnsS8RHQHp77qo1hmAj'
   }
 }, function (err, res, body) {
+  spinner.stop()
   if (err) logger.fatal(err)
-  var requestBody = JSON.parse(body)
-  if (Array.isArray(requestBody)) {
+
+  let result = JSON.parse(body)
+  let projects = result.projects
+
+  if (Array.isArray(projects)) {
     console.log('  Available official templates:')
     console.log()
-    requestBody.forEach(function (repo) {
+
+    projects.forEach(function (repo) {
+      repo.name !== 'cli' && 
       console.log(
         '  ' + chalk.yellow('★') +
-        '  ' + chalk.blue(repo.name) +
+        '  ' + chalk.cyan(repo.name) +
         ' - ' + repo.description)
     })
   } else {
-    console.error(requestBody.message)
+    console.error(result.message)
   }
 })

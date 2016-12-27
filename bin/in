@@ -3,6 +3,8 @@
 require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
-  .command('init', 'generate a new project from a template')
+  .command('create <project-name> <template>', 'Create new directory and run init command')
+  .command('init <template>', 'Create a project through template')
   .command('list', 'list available official templates')
+
   .parse(process.argv)
