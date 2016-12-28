@@ -2,6 +2,7 @@
 'use strict'
 
 const path = require('path')
+const shell = require('shelljs')
 const program = require('commander')
 // const exists = require('fs').existsSync
 const os = require('os')
@@ -10,6 +11,7 @@ const uid = require('uid')
 const ora = require('ora')
 const chalk = require('chalk')
 const inquirer = require('inquirer')
+const exec = require('../lib/exec')
 const logger = require('../lib/logger')
 const download = require('../lib/download')
 const generate = require('../lib/generate')
@@ -87,12 +89,26 @@ const downloadTemplate = function () {
  * @param  {string} name slush template name
  */
 const builder = function () {
-  logger.log('generator project')
+  logger.log('generator project\n')
 
   generate(name, tmp, to, function (err) {
     if (err) logger.fatal(err)
+
     console.log()
     logger.success('Generated "%s".', name)
+
+    installDependencies()
+  })
+}
+
+const installDependencies = function () {
+  logger.log('install dependencies\n')
+
+  let isYarn = shell.which('yarn')
+  let command = isYarn ? 'yarn' : 'npm'
+
+  exec(command, ['install'], {
+    stdio: 'inherit',
   })
 }
 
