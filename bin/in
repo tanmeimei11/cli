@@ -6,5 +6,6 @@ require('commander')
   .command('create <project-name> <template>', 'Create new directory and run init command')
   .command('init <template>', 'Create a project through template')
   .command('list', 'list available official templates')
+  .command('build', 'To zip the dist directory')
 
   .parse(process.argv)

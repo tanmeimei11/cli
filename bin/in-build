@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+'use strict'
+
+const fs = require('fs')
+const archiver = require('archiver')
+const logger = require('../lib/logger')
+const exec = require('../lib/exec')
+
+if (!fs.existsSync('package.json')) {
+	logger.fatal('缺失项目配置文件 package.json')
+}
+
+var config = JSON.parse(fs.readFileSync('package.json'))
+var tasks = config.scripts || {}
+
+if (!config.scripts.build) {
+	logger.fatal('缺失 npm run build 任务')
+}
+
+exec('npm', ['run', 'build'], {
+	stdio: 'inherit',
+})
+
+// To zip the dist directory
+// create a file to stream archive data to.
+var output = fs.createWriteStream('/dist.zip');
+var archive = archiver('zip')
+
+output.on('close', function() {
+  console.log(archive.pointer() + ' total bytes');
+  console.log('archiver has been finalized and the output file descriptor has closed.');
+});
+
+archive.pipe(output)
+archive.glob('/dist/**')
+archive.finalize()
