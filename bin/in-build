@@ -2,6 +2,7 @@
 'use strict'
 
 const fs = require('fs')
+const shelljs = require('shelljs')
 const archiver = require('archiver')
 const logger = require('../lib/logger')
 const exec = require('../lib/exec')
@@ -21,16 +22,19 @@ exec('npm', ['run', 'build'], {
 	stdio: 'inherit',
 })
 
+shelljs.cd('dist')
 // To zip the dist directory
 // create a file to stream archive data to.
-var output = fs.createWriteStream('/dist.zip');
+var output = fs.createWriteStream('dist.zip');
 var archive = archiver('zip')
 
 output.on('close', function() {
-  console.log(archive.pointer() + ' total bytes');
-  console.log('archiver has been finalized and the output file descriptor has closed.');
-});
+  	console.log(archive.pointer() + ' total bytes');
+  	logger.success('build 成功，赶紧去提交吧')
+
+	shelljs.mv('dist.zip', '../')
+})
 
 archive.pipe(output)
-archive.glob('/dist/**')
+archive.glob('**')
 archive.finalize()
