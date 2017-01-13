@@ -6,6 +6,7 @@ const shelljs = require('shelljs')
 const archiver = require('archiver')
 const logger = require('../lib/logger')
 const exec = require('../lib/exec')
+const dist = 'dist'
 
 if (!fs.existsSync('package.json')) {
 	logger.fatal('缺失项目配置文件 package.json')
@@ -22,19 +23,19 @@ exec('npm', ['run', 'build'], {
 	stdio: 'inherit',
 })
 
-shelljs.cd('dist')
-// To zip the dist directory
-// create a file to stream archive data to.
-var output = fs.createWriteStream('dist.zip');
-var archive = archiver('zip')
+// shelljs.cd(dist)
+// // To zip the dist directory
+// // create a file to stream archive data to.
+// var output = fs.createWriteStream(`${dist}.zip`);
+// var archive = archiver('zip')
 
-output.on('close', function() {
-  	console.log(archive.pointer() + ' total bytes');
-  	logger.success('build 成功，赶紧去提交吧')
+// output.on('close', function() {
+//   	console.log(archive.pointer() + ' total bytes');
+//   	logger.success('build 成功，赶紧去提交吧')
 
-	shelljs.mv('dist.zip', '../')
-})
+// 	shelljs.mv(`${dist}.zip`, '../')
+// })
 
-archive.pipe(output)
-archive.glob('**')
-archive.finalize()
+// archive.pipe(output)
+// archive.glob('**')
+// archive.finalize()
