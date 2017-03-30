@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 'use strict'
 
 const path = require('path')
@@ -76,7 +77,7 @@ const downloadTemplate = function () {
     spinner.stop()
     logger.success('脚手架下载成功')
     if (err) logger.fatal('Failed to download repo ' + template + ': ' + err.message.trim())
-    
+
     builder()
     process.on('exit', function () {
       rm(tmp)
@@ -94,20 +95,35 @@ const builder = function () {
   generate(name, tmp, to, function (err) {
     if (err) logger.fatal(err)
 
-    console.log()
-    logger.success('Generated "%s".', name)
+    inquirer.prompt([{
+      type: 'list',
+      name: 'installDep',
+      message: '选择依赖安装',
+      choices: [{
+        name: '全部依赖',
+        value: ''
+      }, {
+        name: '开发依赖',
+        value: '--production'
+      }]
+    }], function (answers) {
+      // Use user feedback for... whatever!!
+      let type = answers['installDep'];
+      logger.success('Generated "%s".', name)
 
-    installDependencies()
+      installDependencies(type)
+    });
   })
 }
 
-const installDependencies = function () {
-  logger.log('install dependencies\n')
+const installDependencies = function (type) {
+
+  logger.log('install ' + type + ' dependencies\n')
 
   let isYarn = shell.which('yarn')
   let command = isYarn ? 'yarn' : 'npm'
 
-  exec(command, ['install'], {
+  exec(command, ['install', type], {
     stdio: 'inherit',
   })
 }
