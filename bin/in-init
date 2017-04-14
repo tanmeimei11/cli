@@ -92,38 +92,23 @@ const downloadTemplate = function () {
 const builder = function () {
   logger.log('generator project\n')
 
-  generate(name, tmp, to, function (err) {
+  generate(name, tmp, to, function (err, opts) {
     if (err) logger.fatal(err)
 
-    inquirer.prompt([{
-      type: 'list',
-      name: 'installDep',
-      message: '选择依赖安装',
-      choices: [{
-        name: '全部依赖',
-        value: ''
-      }, {
-        name: '开发依赖',
-        value: '--production'
-      }]
-    }], function (answers) {
-      // Use user feedback for... whatever!!
-      let type = answers['installDep'];
-      logger.success('Generated "%s".', name)
-
-      installDependencies(type)
-    });
+    // Use user feedback for... whatever!!
+    logger.success('Generated "%s".', name)
+    installDependencies(opts['installDep'])
   })
 }
 
-const installDependencies = function (type) {
+const installDependencies = function (arg) {
 
-  logger.log('install ' + type + ' dependencies\n')
+  logger.log('install ' + arg + ' dependencies\n')
 
   let isYarn = shell.which('yarn')
   let command = isYarn ? 'yarn' : 'npm'
 
-  exec(command, ['install', type], {
+  exec(command, ['install', arg], {
     stdio: 'inherit',
   })
 }
