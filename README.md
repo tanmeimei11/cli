@@ -10,10 +10,19 @@ Prerequisites: [Node.js](https://nodejs.org/en/) (>=4.x, 6.x preferred) and [Git
 $ npm install git+ssh://git@githost.in66.cc:in-template/cli.git -g
 ```
 
+Modify `hosts`
+``` vim
+10.10.105.86 npm.dot.com
+```
+
+``` bash 
+$ npm i in-cli -g --registry http://npm.dot.com
+```
+
 ### Usage
 
 ``` bash
-$ in create <project-name> [<template-name>]
+$ in-create <project-name> [<template-name>]
 ```
 
 Example:
