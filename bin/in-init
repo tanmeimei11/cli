@@ -101,14 +101,15 @@ const builder = function () {
   })
 }
 
-const installDependencies = function (arg) {
+const installDependencies = function (dep) {
 
-  logger.log('install ' + arg + ' dependencies\n')
+  logger.log('install ' + dep + ' dependencies\n')
 
   let isYarn = shell.which('yarn')
   let command = isYarn ? 'yarn' : 'npm'
 
-  exec(command, ['install', arg], {
+  // yarn bug
+  exec(command, dep ? ['install', dep] : ['install'], {
     stdio: 'inherit',
   })
 }
