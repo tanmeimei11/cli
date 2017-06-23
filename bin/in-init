@@ -5,7 +5,7 @@
 const path = require('path')
 const shell = require('shelljs')
 const program = require('commander')
-// const exists = require('fs').existsSync
+const exists = require('fs').existsSync
 const os = require('os')
 const rm = require('rimraf').sync
 const uid = require('uid')
@@ -114,4 +114,25 @@ const installDependencies = function (dep) {
   })
 }
 
-downloadTemplate()
+
+// https://github.com/vuejs/vue-cli/blob/master/lib/local-path.js
+const isLocalPath = function (templatePath) {
+  return /^[./]|(^[a-zA-Z]:)/.test(templatePath)
+}
+
+const getTemplatePath = function (templatePath) {
+  return path.isAbsolute(templatePath)
+      ? templatePath
+      : path.normalize(path.join(process.cwd(), templatePath))
+}
+
+if (isLocalPath(template)) {
+  tmp = getTemplatePath(template)
+  if (exists(tmp)) {
+    builder()
+  } else {
+    logger.fatal('Local template "%s" not found.', tmp)
+  }
+} else {
+  downloadTemplate()
+}
