@@ -1,6 +1,6 @@
 {
   "name": "in-cli",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A simple CLI for scaffolding in projects.",
   "preferGlobal": true,
   "bin": {
