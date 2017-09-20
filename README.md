@@ -12,7 +12,7 @@ $ npm install git+ssh://git@githost.in66.cc:in-template/cli.git -g
 
 Modify `hosts`
 ``` vim
-10.10.105.86 npm.dot.com
+10.10.105.88 npm.dot.com
 ```
 
 ``` bash 
