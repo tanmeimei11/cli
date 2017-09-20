@@ -10,7 +10,6 @@ const ora = require('ora')
  * Padding.
  */
 
-console.log()
 process.on('exit', function () {
   console.log()
 })

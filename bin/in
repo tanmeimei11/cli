@@ -1,11 +1,14 @@
 #!/usr/bin/env node
-
 require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
   .command('create <project-name> <template>', 'Create new directory and run init command')
   .command('init <template>', 'Create a project through template')
   .command('list', 'list available official templates')
-  .command('build', 'To zip the dist directory')
+  .command('start', 'start development')
+  .command('build', 'build project')
+  .command('tiny', 'tiny image directory')
+  .command('qiniu', 'upload image directory to qiniu')
+  .command('publish', 'publish branch to qa/webtest')
 
   .parse(process.argv)

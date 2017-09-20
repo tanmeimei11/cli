@@ -39,7 +39,10 @@ program.on('--help', function () {
 /**
  * Help.
  */
-if (program.args.length < 1) return program.help()
+if (program.args.length < 1) {
+  program.help()
+  process.exit(1)
+}
 
 /**
  * Padding.

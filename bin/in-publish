@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+'use strict'
+const request = require('http').request
+const execSync = require('child_process').execSync
+const logger = require('../lib/logger')
+
+const JENKINS_TOKEN = execSync('npm config get JENKINS_TOKEN').toString()
+const BRANCH = execSync('git status | head -n 1  | awk \'{print  $3}\'').toString().trim()
+
+
+let jenkisPost = body => new Promise((resolve, reject) => {
+  var bodyString = `json=${encodeURIComponent(JSON.stringify(body))}`
+  var req = request({
+    port: 8001,
+    hostname: '10.10.106.240',
+    method: 'POST',
+    auth: JENKINS_TOKEN.trim(),
+    headers: {
+      'Content-Length': Buffer.byteLength(bodyString),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    path: '/jenkins/view/InPromo/job/InPromo_onekey_deploy/build?'
+  }, res => {
+    let rawData = ''
+    res.setEncoding('utf8')
+    res.on('data', chunk => (rawData += chunk))
+    res.on('end', () => {
+      if (rawData.length) {
+        reject(new Error('发布失败'))
+      } else {
+        resolve(rawData)
+      }
+    })
+  })
+  req.write(bodyString)
+  req.end()
+})
+
+const jenkinsPromise = () => {
+  console.log((`开始发布....分支${BRANCH}`))
+  jenkisPost({
+    'parameter': [{
+      'name': 'BRANCH',
+      'value': BRANCH
+    }, {
+      'name': 'deploy_env',
+      'value': 'QA'
+    }]
+  }).then(res => {
+    console.log(('QA发布成功'))
+    console.log(('webtest发布中....'))
+    return jenkisPost({
+      'parameter': [{
+        'name': 'BRANCH',
+        'value': BRANCH
+      }, {
+        'name': 'deploy_env',
+        'value': 'webtest'
+      }]
+    })
+  }).then(res => {
+    console.log(('webtest发布成功'))
+  }).catch(error => {
+    console.log((error))
+  })
+}
+
+if (~['master', 'develop'].indexOf(BRANCH)) {
+  logger.fatal(`不能发布 分支: ${BRANCH}`)
+}
+
+jenkinsPromise()

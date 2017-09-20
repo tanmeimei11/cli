@@ -1,0 +1,114 @@
+#!/usr/bin/env node
+
+'use strict'
+const getEtag = require('../lib/qiniuHash')
+const {
+    request,
+    get
+} = require('https')
+const {
+    dirname,
+    basename
+} = require('path')
+const {
+    blue,
+    red
+} = require('chalk')
+const {
+    readFileSync,
+    appendFileSync
+} = require('fs')
+const {
+    ls,
+    test,
+    cat,
+    touch
+} = require('shelljs')
+const qiniuTokenUrl = 'https://www.in66.com/promo/commonapi/qiniutoken'
+
+const qiniuUpload = (path, tokenRes) => new Promise((resolve, reject) => {
+    let req = request({
+        hostname: 'up.qbox.me',
+        port: 443,
+        path: `/putb64/-1/key/${tokenRes.key}`,
+        method: 'POST',
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
+            Authorization: `UpToken ${tokenRes.token}`,
+            contentType: 'application/octet-stream'
+        }
+    }, uploadRes => {
+        let resInfo = ''
+        uploadRes.on('data', chunk => {
+            resInfo += chunk
+        }).on('end', () => {
+            resInfo = JSON.parse(resInfo.toString())
+            resolve({
+                url: tokenRes.urlTpl.replace('%QiniuUploadImg%', resInfo.key).replace(/\?[^?]+$/, '')
+            })
+        })
+    })
+    req.write(readFileSync(path).toString('base64'))
+    req.end()
+})
+
+const qiniuToken = () => new Promise((resolve, reject) => {
+    get(qiniuTokenUrl, tokenRes => {
+        let resInfo = ''
+        tokenRes.on('data', chunk => {
+            resInfo += chunk
+        }).on('end', () => {
+            resInfo = JSON.parse(resInfo.toString())
+            if (resInfo.succ) {
+                resolve(resInfo.data)
+            } else {
+                reject(resInfo.data.msg)
+                console.log(`Upload Error '${red(resInfo.data.msg)}'.....`)
+            }
+        })
+    })
+})
+
+const qiniuYun = (path, name, hash) => {
+    if (/.(json|gitkeep)$/.test(name)) return ''
+    let relativeName = `${path}/${name}`
+    let qiniuPath = `${path}/qiniu.json`
+    if (!test('-f', qiniuPath)) {
+        appendFileSync(qiniuPath, '{}', {
+            flag: 'w'
+        })
+    }
+    var qiniu = JSON.parse(cat(qiniuPath))
+    if (relativeName in qiniu && qiniu[`${relativeName}`].hash === hash) {
+        console.log(`UploadDone '${blue(relativeName)}'.....`)
+    } else {
+        console.log(`StartUpload '${blue(relativeName)}'.....`)
+        qiniuToken()
+            .then(data => qiniuUpload(`${path}/${name}`, data))
+            .then(res => {
+                let _qiniuData = JSON.parse(cat(qiniuPath))
+                _qiniuData[`${relativeName}`] = {
+                    hash: hash,
+                    qiniuUrl: res.url
+                }
+                appendFileSync(qiniuPath, JSON.stringify(_qiniuData, null, '\t'), {
+                    flag: 'w'
+                })
+                console.log(`UploadDone '${blue(relativeName)}'.....`)
+            })
+            .catch(error => {
+                console.log(`Upload Error '${red(error)}'.....`)
+            })
+    }
+}
+const {
+    config
+} = require('../lib/checkpk')
+
+if (!config.qiniu) {
+    logger.fatal('缺失 qiniu 配置')
+}
+
+ls(config.qiniu).forEach(file => {
+    qiniuYun(dirname(file), basename(file), getEtag(file))
+})

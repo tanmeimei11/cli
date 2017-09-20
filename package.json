@@ -8,7 +8,11 @@
     "in-create": "bin/in-create",
     "in-init": "bin/in-init",
     "in-list": "bin/in-list",
-    "in-build": "bin/in-build"
+    "in-start": "bin/in-start",
+    "in-build": "bin/in-build",
+    "in-tiny": "bin/in-tiny",
+    "in-qiniu": "bin/in-qiniu",
+    "in-publish": "bin/in-publish"
   },
   "repository": {
     "type": "git",
