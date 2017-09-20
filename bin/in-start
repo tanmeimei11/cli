@@ -9,7 +9,7 @@ const execSync = require('child_process').execSync
 
 
 const {
-	scripts = {}, config
+	scripts = {}, config = {}
 } = require('../lib/checkpk')
 
 const hasDocker = shelljs.which('docker') && config.docker

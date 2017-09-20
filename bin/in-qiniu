@@ -102,7 +102,7 @@ const qiniuYun = (path, name, hash) => {
     }
 }
 const {
-    config
+    config = {}
 } = require('../lib/checkpk')
 
 if (!config.qiniu) {

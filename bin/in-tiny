@@ -81,7 +81,7 @@ const compress = (path, name, hash) => {
     }
 }
 const {
-    config
+    config = {}
 } = require('../lib/checkpk')
 
 if (!config.compress) {
