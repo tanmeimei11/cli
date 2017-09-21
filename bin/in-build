@@ -17,7 +17,7 @@ if (!scripts.build) {
 	logger.fatal('缺失 npm run build 任务')
 }
 
-let commndText = hasDocker ? `docker run -it --rm  -p ${config.docker.port} -v \${PWD}:/usr/src/app ${config.docker.image}` : ''
+let commndText = hasDocker ? `docker run -it --rm -v \${PWD}:/usr/src/app ${config.docker.image}` : ''
 
 execSync(`${commndText}  npm run build`, {
 	stdio: 'inherit',
