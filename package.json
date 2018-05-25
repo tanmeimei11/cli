@@ -48,6 +48,8 @@
     "semver": "^5.1.0",
     "shelljs": "^0.7.5",
     "uid": "0.0.2",
+    "inquirer": "^5.2.0",
+    "ora": "^2.1.0",
     "validate-npm-package-name": "^2.2.2"
   },
   "devDependencies": {
